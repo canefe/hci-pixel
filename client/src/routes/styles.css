@@ -7,6 +7,7 @@
 	height: 100%;
 	overscroll-behavior: none;
 	overflow-y: scroll;
+	@apply bg-blue-500;
 }
 
 h1 {

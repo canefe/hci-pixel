@@ -1,66 +1,63 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import Logo from '../assets/logo.png';
+	import { fade } from 'svelte/transition';
 
-	let hammer;
-	let box;
-	let box2;
-	let totalX = 0;
-	let totalY = 0;
+	let currentHint = 0;
 
-	function checkWin() {
-		const redBox = box.getBoundingClientRect();
-		const yellowBox = box2.getBoundingClientRect();
+	const hints = [
+		'Did you know that you can shake your device to play?',
+		'Be sure to allow motion permissions to play the game!',
+		'Win a duel to advance to the next level!'
+	];
 
-		const isInside =
-			redBox.top >= yellowBox.top - 10 &&
-			redBox.left >= yellowBox.left - 10 &&
-			redBox.right <= yellowBox.right + 10 &&
-			redBox.bottom <= yellowBox.bottom + 10;
-
-		if (isInside) {
-			alert('win');
-		}
+	function nextHint() {
+		currentHint = (currentHint + 1) % hints.length;
 	}
 
-	onMount(() => {
-		import('hammerjs').then(({ default: Hammer }) => {
-			hammer = new Hammer(box);
-			hammer.get('pan').set({ direction: Hammer.DIRECTION_ALL });
+	function previousHint() {
+		currentHint = (currentHint - 1 + hints.length) % hints.length;
+	}
 
-			hammer.on('panstart', (ev) => {});
-
-			hammer.on('pan', (ev) => {
-				let newX = totalX + ev.deltaX;
-				let newY = totalY + ev.deltaY;
-
-				box.style.transform = `translate(${newX}px, ${newY}px)`;
-
-				if (ev.isFinal) {
-					totalX += ev.deltaX;
-					totalY += ev.deltaY;
-					checkWin();
-				}
-			});
-		});
-	});
+	// automatically change the hint every 5 seconds
+	setInterval(nextHint, 5000);
 </script>
 
 <page class="center h-full">
-	<container class="container transition-all transform p-8">
+	<container class="container transition-all transform p-8 grid-cols-1 gap-4 grid-rows-2 grid">
 		<header class="center flex-col text-slate-800">
-			<h1>Pixel Duel</h1>
-			<p class="text-center">
-				Pixel Duel is a game where you can challenge your friends to a duel of pixel art.
-			</p>
+			<img src={Logo} alt="Pixel Duel" />
 		</header>
-		<main class="center text-center" style="border:1px solid black;">
-			<div class="flex flex-col gap-4">
-				<div class="btn btn-primary">Play</div>
-				<div bind:this={box} class="bg-red-500 h-32 w-32 transform duration-500 z-10"></div>
-				<div bind:this={box2} class="bg-yellow-500 h-32 w-32 transform duration-500 z-0"></div>
-
-				<div></div>
-			</div>
+		<main class="center text-center flex-col gap-4">
+			<loading class="circle animate-spin" />
+			{#key currentHint}
+				<hints
+					in:fade={{ duration: 600 }}
+					out:fade={{ duration: 10 }}
+					class="hints transform duration-300">{hints[currentHint]}</hints
+				>
+			{/key}
 		</main>
 	</container>
 </page>
+
+<style>
+	.circle {
+		width: 25px;
+		height: 25px;
+		border-radius: 50%;
+		background-image: conic-gradient(
+			rgb(246, 213, 26) 0 25%,
+			transparent 0 50%,
+			rgb(250, 228, 33) 0 75%,
+			transparent 0 100%
+		);
+		border: 1px solid #f3f3f3;
+	}
+
+	.hints {
+		font-size: 0.8rem;
+		background-color: #f3f3f3;
+		padding: 0.5rem;
+		border-radius: 0.5rem;
+	}
+</style>
