@@ -41,6 +41,7 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"colyseus.js": "^0.15.18",
 		"hammerjs": "^2.0.8",
 		"vite-plugin-mkcert": "^1.17.3"
 	}
