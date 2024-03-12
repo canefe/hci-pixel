@@ -1,5 +1,4 @@
-import * as Colyseus from "colyseus.js"
+import * as Colyseus from 'colyseus.js'
+import { PUBLIC_SERVER_URL } from '$env/static/public'
 
-export const client = new Colyseus.Client("ws://localhost:2567")
-
-
+export const client = new Colyseus.Client(`wss://${PUBLIC_SERVER_URL}`)

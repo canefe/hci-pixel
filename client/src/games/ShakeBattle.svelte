@@ -1,48 +1,91 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import Button from './Button.svelte';
+    import {onDestroy, onMount} from 'svelte';
+    import Phaser from 'phaser';
+    import Logo from '../assets/logo.png';
+    import {ShakeBattleScene} from "./scenes/shake-battle";
 
-	let hammer;
-	let box: HTMLElement;
-	let box2;
-	let totalX = 0;
-	let totalY = 0;
+    let game;
+    let resizeListener; // Hold the resize listener for cleanup
 
-	onMount(() => {
-		import('hammerjs').then(({ default: Hammer }) => {
-			hammer = new Hammer(box);
-			hammer.get('pan').set({ direction: Hammer.DIRECTION_ALL });
+    onMount(async () => {
 
-			hammer.on('panstart', (ev) => {});
 
-			hammer.on('pan', (ev) => {
-				let newX = totalX + ev.deltaX;
-				let newY = totalY + ev.deltaY;
+        const config: Phaser.Types.Core.GameConfig = {
+            type: Phaser.AUTO,
+            mode: Phaser.Scale.FIT,
+            autoCenter: Phaser.Scale.CENTER_BOTH,
+            parent: 'phaser-game-container',
+            // dark blue bg
+            dom: {
+                createContainer: true
+            },
+            backgroundColor: '#00008B',
+            scene: ShakeBattleScene,
+            physics: {
+                default: 'arcade',
+                arcade: {
+                    gravity: {y: 200},
+                },
+            },
+        };
 
-				box.style.transform = `translate(${newX}px, ${newY}px)`;
 
-				if (ev.isFinal) {
-					totalX += ev.deltaX;
-					totalY += ev.deltaY;
-				}
-			});
-		});
-	});
+        game = new Phaser.Game(config);
+
+        const resizeGame = () => {
+            if (game) {
+                game.scale.resize(window.innerWidth, window.innerHeight - 200);
+                // if desktop, set a max width
+                if (window.innerWidth > 500) {
+                    game.scale.setGameSize(800, 600);
+                }
+            }
+        };
+
+        window.addEventListener('resize', resizeGame);
+        resizeListener = resizeGame;
+
+
+        resizeGame();
+
+        function permission() {
+            if (typeof (DeviceMotionEvent) !== "undefined" && typeof (DeviceMotionEvent.requestPermission) === "function") {
+                // (optional) Do something before API request prompt.
+                DeviceMotionEvent.requestPermission()
+                    .then(response => {
+                        // (optional) Do something after API prompt dismissed.
+                        if (response == "granted") {
+                            window.addEventListener("devicemotion", (e) => {
+                                // do something for 'e' here.
+                            })
+                        }
+                    })
+                    .catch(console.error)
+            } else {
+                alert("DeviceMotionEvent is not defined");
+            }
+        }
+
+        const btn = document.getElementById("request");
+        btn?.addEventListener("click", permission);
+
+
+    });
+
+    onDestroy(() => {
+        // Clean up the resize event listener when the component is destroyed
+        if (resizeListener) {
+            window.removeEventListener('resize', resizeListener);
+        }
+
+        // Optionally, destroy the Phaser game instance if not needed anymore
+        if (game) {
+            game.destroy(true);
+        }
+    });
 </script>
 
-<game>
-	<div bind:this={box} class="bg-red-500 h-32 w-32 transform duration-500 z-10"></div>
-	<footer class="flex w-full h-32 px-10 gap-1 absolute bottom-0 left-0">
-		{#each new Array(3) as _, i}
-			<Button
-				onClickFunc={() => {
-					totalX = 0;
-					totalY = 0;
-					box.style.transform = `translate(0px, 0px)`;
-				}}
-			/>
-		{/each}
-	</footer>
-</game>
-
-<style></style>
+<div>
+    <button id="request">Permission</button>
+    <div id="phaser-game-container"></div>
+</div>

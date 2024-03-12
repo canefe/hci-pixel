@@ -6,7 +6,7 @@
 
 </script>
 
-<div class="bg-blue-400 h-[100svh]">
+<div class="bg-blue-400 h-full">
     <slot/>
     <SvelteToast/>
 </div>

@@ -3,29 +3,45 @@
 @tailwind utilities;
 
 :root {
-	touch-action: pan-x pan-y;
-	height: 100%;
-	overscroll-behavior: none;
-	overflow-y: scroll;
-	@apply bg-blue-500;
+    touch-action: pan-x pan-y;
+    height: 100%;
+    overscroll-behavior: none;
+    overflow-y: hidden;
+    @apply bg-blue-500;
+}
+
+html, body {
+    @apply h-full;
 }
 
 h1 {
-	@apply text-4xl font-bold;
+    @apply text-4xl font-bold;
 }
 
 .center {
-	@apply flex items-center justify-center;
+    @apply flex items-center justify-center;
 }
 
 .btn {
-	@apply p-4 bg-blue-500 text-white rounded-sm;
+    @apply p-4 bg-blue-500 text-white rounded-sm;
 }
 
 .btn-primary {
-	@apply bg-blue-500 text-white;
+    @apply bg-blue-500 text-white;
 }
 
 .btn-secondary {
-	@apply bg-gray-500 text-white;
+    @apply bg-gray-500 text-white;
+}
+
+.highlight {
+    background-color: red;
+}
+
+.highlight:after {
+    content: '';
+    position: absolute;
+    top: 0;
+    color: white;
+    @apply h-full w-full border-4 border-double border-amber-300 bg-amber-300/20;
 }

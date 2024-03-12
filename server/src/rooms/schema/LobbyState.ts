@@ -1,8 +1,6 @@
 import { Schema, Context, type, MapSchema } from "@colyseus/schema";
 import { Player } from "../../entities/Player";
 
-export class MyRoomState extends Schema {
+export class LobbyState extends Schema {
   @type({ map: Player }) players = new MapSchema<Player>();
-  @type("number") x = 0;
-  @type("number") y = 0;
 }
