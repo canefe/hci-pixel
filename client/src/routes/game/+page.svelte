@@ -2,7 +2,7 @@
     import {onMount} from "svelte";
     import {type ErrorRoomState, type RoomState, roomStore} from "$lib/roomStore";
     import * as Colyseus from "colyseus.js";
-    import LootMusic from "../../assets/loop-music.wav";
+    import LootMusic from "../../assets/music.mp3";
     import MainMenu from "../../components/MainMenu.svelte";
     import {askMotionPermission, motionPermission} from "$lib/motion";
     import Button from "../../games/Button.svelte";
@@ -16,11 +16,14 @@
     let crosshair: HTMLDivElement;
     let highligtedButton: Element;
 
-    let isTilted = false; // Track if the device is currently tilted
+    let isTilted = true; // Track if the device is currently tilted
     const neutralTolerance = 10; // Tolerance for determining neutral position
     let isCooldown = false;
     const cooldownTime = 500; // 1 second
     let betaShower = 0;
+
+    // initial cooldown to avoid accidental actions
+    let initialCooldown = true;
 
     let currentButtonIndex = 0;
 
@@ -29,7 +32,6 @@
     $: motionPermission.subscribe(value => {
         permission = value;
     });
-
 
     function updateHighlight(newIndex: number) {
         const buttons = document.querySelectorAll('.menu-button');
@@ -72,6 +74,7 @@
         if (gammaNeutral && betaNeutral && isTilted && !isCooldown) {
             // Device has returned to neutral, ready for next action
             toast.push('neutral');
+            initialCooldown = false;
             isTilted = false;
             return;
         }
@@ -89,18 +92,20 @@
                 isTilted = true;
             }
 
-            if (e.beta < 40) {
-                // Device tilted upwards, consider as a "click"
-                toast.push((highligtedButton as HTMLButtonElement).id);
-                const translate = {
-                    'Battle': '/game/battle',
-                    'settings': '/settings',
-                    'exit': '/exit'
+            if (!initialCooldown) {
+                if (e.beta < 40) {
+                    // Device tilted upwards, consider as a "click"
+                    toast.push((highligtedButton as HTMLButtonElement).id);
+                    const translate = {
+                        'Battle': '/game/battle',
+                        'Train': '/game/train',
+                        'Sign out': '/exit'
+                    }
+                    window.removeEventListener('deviceorientation', handleOrientation, true)
+                    goto(translate[(highligtedButton as HTMLButtonElement).id as string]);
+                    (highligtedButton as HTMLButtonElement).name
+                    isTilted = true;
                 }
-                window.removeEventListener('deviceorientation', handleOrientation, true)
-                goto(translate[(highligtedButton as HTMLButtonElement).id as string]);
-                (highligtedButton as HTMLButtonElement).name
-                isTilted = true;
             }
 
             if (isTilted) {

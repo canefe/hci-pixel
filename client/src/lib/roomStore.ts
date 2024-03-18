@@ -45,7 +45,7 @@ const createRoomStore = () => {
 				})
 
 				room.onStateChange((state) => {
-					toast.push('State changed')
+					//toast.push('State changed')
 				})
 
 				// Immediately set the Colyseus room object to allow for operations like send()
@@ -55,6 +55,10 @@ const createRoomStore = () => {
 				room.onStateChange((state) => {
 					// Update the separate roomStateStore for UI binding
 					roomStateStore.set(state)
+				})
+
+				room.onMessage('hitEnemy', (message) => {
+					console.log('hitEnemy', message)
 				})
 			} catch (e) {
 				console.error('Error joining room:', e)

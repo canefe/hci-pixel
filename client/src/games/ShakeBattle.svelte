@@ -3,6 +3,8 @@
     import Phaser from 'phaser';
     import Logo from '../assets/logo.png';
     import {ShakeBattleScene} from "./scenes/shake-battle";
+    import MainMenu from "../components/MainMenu.svelte";
+    import TrainMenu from "../components/TrainMenu.svelte";
 
     let game;
     let resizeListener; // Hold the resize listener for cleanup
@@ -86,6 +88,8 @@
 </script>
 
 <div>
-    <button id="request">Permission</button>
-    <div id="phaser-game-container"></div>
+    <div class="absolute top-0 w-full">
+        <TrainMenu/>
+    </div>
+
 </div>

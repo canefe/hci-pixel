@@ -1,11 +1,7 @@
 <script>
-    import {toast} from "@zerodevx/svelte-toast";
-    import TrainingImage from "../assets/training.png";
-
-    // pixel battle game, duels, websocket
     const menuItems = [
-        {name: "Battle", icon: "🏰"},
-        {name: "Train", icon: ""},
+        {name: "Home", icon: "🏰"},
+        {name: "Again", icon: ""},
         {name: "Sign out", icon: ""},
     ]
 </script>

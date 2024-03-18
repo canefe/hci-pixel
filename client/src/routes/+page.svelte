@@ -66,6 +66,9 @@
         // use svelte transition to make it smooth
         if (connectionState === ConnectionState.CONNECTED) {
 
+            if (data?.user) {
+                goto('/game');
+            }
 
         }
     }
