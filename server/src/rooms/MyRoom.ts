@@ -15,6 +15,7 @@ export class MyRoom extends Room<MyRoomState> {
 
     this.onMessage("*", (client, key, value) => {
       // action
+      console.log(key, value);
       if (key === "action") {
         const action = value;
         let enemy;
@@ -29,7 +30,12 @@ export class MyRoom extends Room<MyRoomState> {
           type: action.damage?.type,
         };
         enemy.takeDamage(damage);
-        this.broadcast("action", enemy);
+        console.log("Attacked: ", enemy.name, damage);
+        this.broadcast("action", {
+          id: enemy.id,
+          damage: damage,
+          name: enemy.name,
+        });
         console.log(damage);
       }
     });

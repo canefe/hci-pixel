@@ -44,24 +44,7 @@
         }, 3000);
     });
 
-    function startGame() {
-        room.send("hitEnemy", {damage: 10});
-    }
-
     $: {
-        room?.onMessage("hitEnemy", (data) => {
-            // check if the player is the one who hit the enemy
-            const playerHealth = document.getElementById("playerProgress");
-            const opponentHealth = document.getElementById("opponentProgress");
-            if (data.id === room.sessionId) {
-
-                gsap.to(opponentHealth, {width: `${data.health}%`, duration: 0.5});
-            } else {
-                gsap.to(playerHealth, {width: `${data.health}%`, duration: 0.5});
-
-            }
-        });
-
         room?.onMessage("action", (data) => {
             // check if the player is the one who hit the enemy
             const playerHealth = document.getElementById("playerProgress");
@@ -70,8 +53,13 @@
                 gsap.to(opponentHealth, {width: `${data.health}%`, duration: 0.5});
             } else {
                 gsap.to(playerHealth, {width: `${data.health}%`, duration: 0.5});
-
             }
+
+            toast.push(
+                data?.id === room?.sessionId
+                    ? `You hit the enemy with ${data?.damage?.type}`
+                    : `${data?.name} hit you with ${data.damage?.type}`
+            );
         });
     }
 
@@ -224,22 +212,20 @@
         <span class="text-6xl text-white">Shake!</span>
     </h1>
 
-    <div class="monster transition-all  duration-500">
-
-    </div>
     <div bind:this={crosshair} class="crosshair absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
         <div class="w-5 h-5 bg-purple-300 rounded border border-purple-700"></div>
     </div>
-    <ShakeBattleHUD/>
+
     <div class="absolute  top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
         <div id="crosshair-border" class="w-10 h-10 bg-purple-600/10 border"></div>
     </div>
-    <button class="bg-blue-500 text-white p-2 rounded absolute bottom-20" on:click={startGame}>
-        Start Game
-    </button>
+
+    <div class="absolute bottom-40">
+        <ShakeBattleHUD/>
+    </div>
 
     <h1 class="player text-white text-lg flex items-center justify-center absolute bottom-10 left-0 right-0">
-        {player?.email} - {player?.level} Level
+        {player?.name} - {player?.level} Level
     </h1>
     <div class="progressBar absolute bottom-5">
         <div class="progressBarFill " id="playerProgress"></div>
